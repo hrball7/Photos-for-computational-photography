@@ -1,0 +1,36 @@
+im=imread("https://github.com/hrball7/Photos-for-computational-photography/blob/main/mimic.jpg?raw=true");
+% resize the picture if needed so it is no more than 1000x1000
+im = imresize(im, [1000 1000], 'Method', 'bicubic');
+filtered = myFilter(im);
+% display the result
+figure(1); montage({im, filtered}, 'Size', [1 2], 'BorderSize', [25 25], 'BackgroundColor', [1 1 1]);
+
+function result = myFilter(im)
+
+    HSV = rgb2hsv(im);
+    HSV(:,:,2) = HSV(:,:,2) * 4;
+    result = hsv2rgb(HSV);
+
+    result = im2double(result);
+
+    [rows, cols, ~] = size(result);
+
+    [X, Y] = meshgrid(linspace(-1,1,cols), linspace(-1,1,rows));
+    R = sqrt(X.^2 + Y.^2);
+
+    vignette_mask = 1 - 0.3 * (R.^2);
+    vignette_mask = mat2gray(vignette_mask); 
+
+    result(:,:,1) = result(:,:,1) .* vignette_mask;
+    result(:,:,2) = result(:,:,2) .* vignette_mask;
+    result(:,:,3) = result(:,:,3) .* vignette_mask;
+
+
+    brightness_mask = 1 + 0.4 * (1 - R.^2);  
+
+    result(:,:,1) = result(:,:,1) .* brightness_mask;
+    result(:,:,2) = result(:,:,2) .* brightness_mask;
+    result(:,:,3) = result(:,:,3) .* brightness_mask;
+
+    result = im2uint8(result);
+end
