@@ -1,0 +1,40 @@
+im=imread("https://github.com/hrball7/Photos-for-computational-photography/blob/main/P1080708.JPG?raw=true");
+% resize the picture if needed so it is no more than 1000x1000
+im = imresize(im, [1000 1000], 'Method', 'bicubic');
+filtered = myFilter(im);
+% display the result
+figure(1); montage({im, filtered}, 'Size', [1 2], 'BorderSize', [25 25], 'BackgroundColor', [1 1 1]);
+
+im=imread("https://github.com/hrball7/Photos-for-computational-photography/blob/main/P1080519.JPG?raw=true");
+% resize the picture if needed so it is no more than 1000x1000
+im = imresize(im, [1000 1000], 'Method', 'bilinear');
+filtered = myFilter(im);
+% display the result
+figure(2); montage({im, filtered}, 'Size', [1 2], 'BorderSize', [25 25], 'BackgroundColor', [1 1 1]);
+
+im=imread("https://github.com/hrball7/Photos-for-computational-photography/blob/main/IMG_0887.jpg?raw=true");
+% resize the picture if needed so it is no more than 1000x1000
+im = imresize(im, [1000 1000], 'Method', 'bilinear');
+filtered = myFilter(im);
+% display the result
+figure(3); montage({im, filtered}, 'Size', [1 2], 'BorderSize', [25 25], 'BackgroundColor', [1 1 1]);
+
+
+
+function result = myFilter(im)
+
+    im = im2double(im);
+    red = im(:,:,1);
+    green = im(:,:,2);
+    blue = im(:,:,3);
+
+    % color filter
+    filter_r = red*0.802 + green*0.234;
+    filter_g = green*0.834;
+    filter_b = blue*0.831;
+    color = cat(3, filter_r, filter_g, filter_b);
+    sigma = 4;
+    h = fspecial('gaussian', 6*sigma, sigma);
+    result = imfilter(color, h, 'replicate');
+
+end
