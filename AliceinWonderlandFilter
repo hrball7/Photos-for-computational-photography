@@ -1,0 +1,64 @@
+%% Filter effect description
+%{
+
+Filter Name:  Alice in Wonderland (Tim's edition)
+
+Effect Description:
+
+This effect is inspired by Tim Burton's Alice in Wonderland, where Alice is grown up and ready to face the Red Queen. This filter should be
+whimsical, but a bit dark and moody. This filter captures the magic, wonder, and mystical nature of dark tales of fiction. 
+
+%}
+
+
+% All photos were shot by me personally :)
+
+im=imread("https://github.com/hrball7/Photos-for-computational-photography/blob/main/IMG_3287.jpg?raw=true");
+% resize the picture if needed so it is no more than 1000x1000
+im = imresize(im, [1000 1000], 'Method', 'bicubic');
+filtered = myFilter(im);
+% display the result
+figure(1); montage({im, filtered}, 'Size', [1 2], 'BorderSize', [25 25], 'BackgroundColor', [1 1 1]);
+
+im=imread("https://github.com/hrball7/Photos-for-computational-photography/blob/main/IMG_3420.jpg?raw=true");
+% resize the picture if needed so it is no more than 1000x1000
+im = imresize(im, [1000 1000], 'Method', 'bilinear');
+filtered = myFilter(im);
+% display the result
+figure(2); montage({im, filtered}, 'Size', [1 2], 'BorderSize', [25 25], 'BackgroundColor', [1 1 1]);
+
+im=imread("https://github.com/hrball7/Photos-for-computational-photography/blob/main/P1080723.JPG?raw=true");
+% resize the picture if needed so it is no more than 1000x1000
+im = imresize(im, [1000 1000], 'Method', 'bilinear');
+filtered = myFilter(im);
+% display the result
+figure(3); montage({im, filtered}, 'Size', [1 2], 'BorderSize', [25 25], 'BackgroundColor', [1 1 1]);
+
+
+function result = myFilter(im)
+    % colors
+    red   = im(:,:,1);
+    green = im(:,:,2);
+    blue  = im(:,:,3);
+
+    % color filter
+    filter_b = red*0.372 + green*0.434 + blue*0.731;
+    result = cat(3, red, green, filter_b);
+
+    %Vignette effect
+    result = im2double(result);
+    [rows, cols, ~] = size(result);
+
+    [X, Y] = meshgrid(linspace(-1,1,cols), linspace(-1,1,rows));
+    R = sqrt(X.^2 + Y.^2);
+
+    % Soft, round vignette mask
+    vignette_mask = 1 - 0.15 * (R.^2);
+    vignette_mask = mat2gray(vignette_mask); 
+
+    % Apply vignette across all 3 channels
+    for c = 1:3
+        result(:,:,c) = result(:,:,c) .* vignette_mask;
+    end
+    result = im2uint8(result);
+end
